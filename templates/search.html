@@ -1,0 +1,23 @@
+<h1>Hakukone</h1>
+<form action="/search" method="post">
+    <p>
+        Hakusana: <br />
+        <input type="text" name="keyword" />
+    </p>
+    <input type="submit" value="Hae" />
+</form>
+
+{% if threads %}
+<h2>Hakutulokset hakusanalle "{{ keyword }}":</h2>
+<ul>
+    {% for thread in threads %}
+    <li>
+        <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
+        <p>Viimeksi päivitetty: {{ thread.last_updated }}</p>
+        <p>Viestejä: {{ thread.total_messages }}</p>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<h2>Ei tuloksia hakusanalle "{{ keyword }}".</h2>
+{% endif %}

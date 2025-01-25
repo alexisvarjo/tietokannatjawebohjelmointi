@@ -1,0 +1,23 @@
+{% for message in messages %}
+<p>{{ message.username }} ({{ message.sent_at }}):</p>
+<p>{{ message.content }}</p>
+{% if message.user_id == session.user_id %}
+<p>
+    <a href="/edit/{{ message.id }}">Muokkaa</a> |
+    <a href="/remove/{{ message.id }}">Poista</a>
+</p>
+{% endif %}
+<hr />
+{% endfor %} {% if session.user_id %}
+<h2>Uusi viesti</h2>
+
+<form action="/new_message" method="post">
+    <p>
+        Viesti:<br />
+        <textarea name="content" rows="5" cols="40"></textarea>
+    </p>
+    <input type="hidden" name="post_id" value="{{ thread.id }}" />
+    <input type="submit" value="Lähetä" />
+</form>
+<hr />
+{% endif %}

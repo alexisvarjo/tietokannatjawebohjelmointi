@@ -1,0 +1,9 @@
+<form action="/edit/{{ message.id }}" method="post">
+    <p>
+        Viesti:<br />
+        <textarea name="content" rows="5" cols="40">
+{{ message.content }}</textarea
+        >
+    </p>
+    <input type="submit" value="Lähetä" />
+</form>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Kirjautuminen</title>
+    </head>
+
+    <body>
+        {% if session.username %}
+        <p>Olet kirjautunut nimellä {{ session.username }}</p>
+        <p>
+            <a href="/logout">Kirjaudu ulos</a>
+        </p>
+        {% else %}
+        <form action="/login" method="post">
+            <p>
+                Tunnus: <br />
+                <input type="text" name="username" />
+            </p>
+            <p>
+                Salasana: <br />
+                <input type="password" name="password" />
+            </p>
+            <input type="submit" value="Kirjaudu" />
+        </form>
+        {% endif %} {% for thread in threads %}
+        <p>
+            <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
+            <br />
+            {{ thread.total }} viestiä, uusin {{ thread.last }}
+        </p>
+        <hr />
+        {% endfor %} {% if session.user_id %}
+        <h2>Uusi ketju</h2>
+
+        <form action="/new_thread" method="post">
+            <p>
+                Otsikko: <br />
+                <input type="text" name="title" />
+            </p>
+            <p>
+                Viesti: <br />
+                <textarea name="content" rows="5" cols="40"></textarea>
+            </p>
+            <input type="submit" value="Lähetä" />
+            <input type="radio" name="category" value="1"/> Myynti
+            <input type="radio" name="category" value="2"/> Osto
+            <input type="radio" name="category" value="3"/> Vaihto
+
+        </form>
+        {% endif %}
+        <br>
+        <br>
+        <a href="/register">
+            <button type="button">rekisteröidy</button>
+            <br>
+            <br>
+            <br>
+            <br>
+        <a href="/search">
+            <button type="button">haku</button>
+        </a>
+    </body>
+</html>
