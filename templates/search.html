@@ -13,11 +13,23 @@
                 <li><a href="/users">Users</a></li>
             </ul>
         </nav>
+
         <h1>Hakukone</h1>
+
+        <!-- Display error message if available -->
+        {% if error_message %}
+        <p style="color: red">{{ error_message }}</p>
+        {% endif %}
+
         <form action="/search" method="post">
             <p>
                 Hakusana: <br />
-                <input type="text" name="keyword" />
+                <input
+                    type="text"
+                    name="keyword"
+                    value="{{ keyword|default('') }}"
+                    required
+                />
             </p>
             <input type="submit" value="Hae" />
         </form>
@@ -34,8 +46,8 @@
             </li>
             {% endfor %}
         </ul>
-        {% else %}
+        {% else %} {% if keyword %}
         <h2>Ei tuloksia hakusanalle "{{ keyword }}".</h2>
-        {% endif %}
+        {% endif %} {% endif %}
     </body>
 </html>

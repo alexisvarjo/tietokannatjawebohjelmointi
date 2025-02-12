@@ -1,19 +1,38 @@
-<nav>
-    <ul style="list-style-type: none; display: inline-flex">
-        <li><a href="/">Home</a></li>
-        <li>&nbsp;&nbsp;</li>
-        <li><a href="/about">About</a></li>
-        <li>&nbsp;&nbsp;</li>
-        <li><a href="/users">Users</a></li>
-    </ul>
-</nav>
+<!doctype html>
+<html>
+    <head>
+        <title>Kirjaudu sisään</title>
+    </head>
+    <body>
+        <nav>
+            <ul style="list-style-type: none; display: inline-flex">
+                <li><a href="/">Home</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/about">About</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
 
-<form action="/login" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required />
-    <br />
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required />
-    <br />
-    <input type="submit" value="Login" />
-</form>
+        <!-- Display error message if available -->
+        {% if error_message %}
+        <p style="color: red">{{ error_message }}</p>
+        {% endif %}
+
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                value="{{ username|default('') }}"
+                required
+            />
+            <br />
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+            <br />
+            <input type="submit" value="Login" />
+        </form>
+    </body>
+</html>

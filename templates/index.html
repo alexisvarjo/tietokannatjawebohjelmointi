@@ -14,6 +14,7 @@
     </nav>
     <body>
         <h1>Ilmoitukset</h1>
+
         {% if threads|length == 0 %}
         <p>Ei ilmoituksia</p>
         {% else %} {% for thread in threads %}
@@ -24,15 +25,7 @@
             {{ thread.total }} viestiä, uusin: {{ thread.last }}
         </p>
         <hr />
-        {% endfor %} {% endif %} {% for thread in threads %}
-        <p>
-            <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
-            <br />
-            {{ thread.category }} <br />
-            {{ thread.total }} viestiä, uusin: {{ thread.last }}
-        </p>
-        <hr />
-        {% endfor %} {% if session.user_id %}
+        {% endfor %} {% endif %} {% if session.user_id %}
         <a href="/new_thread">
             <button type="button">Uusi ilmoitus</button>
         </a>
@@ -41,14 +34,11 @@
         <a href="/register">
             <button type="button">Rekisteröidy</button>
         </a>
-        <a href="/login">
-            <button type="button">Kirjaudu sisään</button>
         {% endif %}
+
         <br /><br />
-        {% if threads|length == 0 %} {% else %}
         <a href="/search">
             <button type="button">Haku</button>
         </a>
-        {% endif %}
     </body>
 </html>

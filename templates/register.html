@@ -3,30 +3,39 @@
     <head>
         <title>Rekisteröinti</title>
     </head>
-
-    <nav>
-        <ul style="list-style-type: none; display: inline-flex">
-            <li><a href="/">Home</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/about">About</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/users">Users</a></li>
-        </ul>
-    </nav>
-
     <body>
+        <nav>
+            <ul style="list-style-type: none; display: inline-flex">
+                <li><a href="/">Home</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/about">About</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
+
+        <!-- Display error message if available -->
+        {% if error_message %}
+        <p style="color: red">{{ error_message }}</p>
+        {% endif %}
+
         <form action="/create" method="post">
             <p>
                 Tunnus: <br />
-                <input type="text" name="username" />
+                <input
+                    type="text"
+                    name="username"
+                    value="{{ username|default('') }}"
+                    required
+                />
             </p>
             <p>
                 Salasana: <br />
-                <input type="password" name="password1" />
+                <input type="password" name="password1" required />
             </p>
             <p>
                 Salasana uudestaan: <br />
-                <input type="password" name="password2" />
+                <input type="password" name="password2" required />
             </p>
             <input type="submit" value="Luo tunnus" />
         </form>

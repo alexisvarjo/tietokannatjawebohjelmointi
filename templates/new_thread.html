@@ -3,7 +3,6 @@
     <head>
         <title>Uusi ilmoitus</title>
     </head>
-
     <nav>
         <ul style="list-style-type: none; display: inline-flex">
             <li><a href="/">Home</a></li>
@@ -14,19 +13,69 @@
         </ul>
     </nav>
     <body>
+        <!-- Display error message if exists -->
+        {% if error_message %}
+        <p style="color: red">{{ error_message }}</p>
+        {% endif %}
+
         <form action="/new_thread" method="post">
             <p>
                 Otsikko: <br />
-                <input type="text" name="title" />
+                <input
+                    type="text"
+                    name="title"
+                    value="{{ title|default('') }}"
+                />
             </p>
             <p>
                 Viesti: <br />
-                <textarea name="content" rows="5" cols="40"></textarea>
+                <textarea name="content" rows="5" cols="40">
+{{ content|default('') }}</textarea
+                >
+            </p>
+            <p>
+                Kategoria: <br />
+                <input
+                    type="radio"
+                    name="category"
+                    value="1"
+                    {%
+                    if
+                    category=""
+                    ="1"
+                    %}checked{%
+                    endif
+                    %}
+                />
+                Myynti
+                <input
+                    type="radio"
+                    name="category"
+                    value="2"
+                    {%
+                    if
+                    category=""
+                    ="2"
+                    %}checked{%
+                    endif
+                    %}
+                />
+                Osto
+                <input
+                    type="radio"
+                    name="category"
+                    value="3"
+                    {%
+                    if
+                    category=""
+                    ="3"
+                    %}checked{%
+                    endif
+                    %}
+                />
+                Vaihto
             </p>
             <input type="submit" value="Lähetä" />
-            <input type="radio" name="category" value="1" /> Myynti
-            <input type="radio" name="category" value="2" /> Osto
-            <input type="radio" name="category" value="3" /> Vaihto
         </form>
         <br />
     </body>
