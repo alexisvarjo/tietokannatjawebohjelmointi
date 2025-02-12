@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Uusi ilmoitus</title>
+    </head>
+
+    <nav>
+        <ul style="list-style-type: none; display: inline-flex">
+            <li><a href="/">Home</a></li>
+            <li>&nbsp;&nbsp;</li>
+            <li><a href="/about">About</a></li>
+            <li>&nbsp;&nbsp;</li>
+            <li><a href="/users">Users</a></li>
+        </ul>
+    </nav>
+    <body>
+        <form action="/new_thread" method="post">
+            <p>
+                Otsikko: <br />
+                <input type="text" name="title" />
+            </p>
+            <p>
+                Viesti: <br />
+                <textarea name="content" rows="5" cols="40"></textarea>
+            </p>
+            <input type="submit" value="Lähetä" />
+            <input type="radio" name="category" value="1" /> Myynti
+            <input type="radio" name="category" value="2" /> Osto
+            <input type="radio" name="category" value="3" /> Vaihto
+        </form>
+        <br />
+    </body>
+</html>

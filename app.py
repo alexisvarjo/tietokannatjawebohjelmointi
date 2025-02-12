@@ -65,8 +65,11 @@ def logout():
     return redirect("/")
 
 
-@app.route("/new_thread", methods=["POST"])
+@app.route("/new_thread", methods=["POST", "GET"])
 def new_thread():
+    if request.method == "GET":
+        return render_template("new_thread.html")
+
     title = request.form["title"]
     content = request.form["content"]
     type = request.form["category"]
