@@ -80,3 +80,17 @@ def search(keyword):
         ORDER BY last_updated DESC
     """
     return db.query(sql, [f"%{keyword}%", f"%{keyword}%"])
+
+def get_users():
+    sql = "SELECT id, username FROM users"
+    return db.query(sql)
+
+def get_user_threads():
+    sql = """
+        SELECT p.id, p.title, p.user_id, COUNT(m.id) AS message_count
+        FROM posts p
+        LEFT JOIN messages m ON p.id = m.post_id
+        GROUP BY p.id
+        ORDER BY p.id DESC
+    """
+    return db.query(sql)

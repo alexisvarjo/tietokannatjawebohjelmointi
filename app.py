@@ -12,8 +12,6 @@ app = Flask(__name__)
 
 app.secret_key = config.secret_key
 
-
-
 @app.route("/register")
 def register():
     return render_template("register.html")
@@ -133,3 +131,20 @@ def new_message():
 
     posts.add_message(content, user_id, thread_id)
     return redirect("/thread/" + str(thread_id))
+
+@app.route("/users", methods=["GET"])
+def users():
+    users_list = [dict(u) for u in posts.get_users()]
+    all_threads = [dict(t) for t in posts.get_user_threads()]
+
+    for user in users_list:
+        user['threads'] = []
+
+    for thread in all_threads:
+        thread['url'] = f"/thread/{thread['id']}"
+        for user in users_list:
+            if user["id"] == thread["user_id"]:
+                user["threads"].append(thread)
+                break
+
+    return render_template("users.html", users=users_list)
