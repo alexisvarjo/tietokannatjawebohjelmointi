@@ -7,7 +7,8 @@ from flask import Flask
 
 def get_posts():
     sql = """
-        SELECT p.id, p.title, COUNT(m.id) AS total, MAX(m.sent_at) AS last
+        SELECT p.id, p.title, p.type AS category,
+               COUNT(m.id) AS total, MAX(m.sent_at) AS last
         FROM posts p
         LEFT JOIN messages m ON p.id = m.post_id
         GROUP BY p.id
@@ -17,9 +18,12 @@ def get_posts():
 
 
 
+
 def add_thread(title, content, user_id, type):
+    types = {1: "Myynti", 2: "Osto", 3: "Vaihto"}
+    post_type = types[int(type)]
     sql = "INSERT INTO posts (title, user_id, type) VALUES (?, ?, ?)"
-    db.execute(sql, [title, user_id, type])
+    db.execute(sql, [title, user_id, post_type])
     thread_id = db.last_insert_id()
     add_message(content, user_id, thread_id)
     return thread_id
@@ -31,8 +35,9 @@ def add_message(content, user_id, thread_id):
 
 
 def get_thread(thread_id):
-    sql = "SELECT id, title FROM posts WHERE id = ?"
+    sql = "SELECT id, title, type AS category FROM posts WHERE id = ?"
     return db.query(sql, [thread_id])[0]
+
 
 def get_messages(thread_id):
     sql = """SELECT m.id, m.content, m.sent_at, m.user_id, u.username
@@ -69,8 +74,9 @@ def remove_thread(thread_id):
 def search(keyword):
     sql = """
         SELECT
-            posts.id AS post_id,
+            posts.id AS id,
             posts.title,
+            posts.type AS category,
             COUNT(messages.id) AS total_messages,
             MAX(messages.sent_at) AS last_updated
         FROM posts
@@ -81,13 +87,14 @@ def search(keyword):
     """
     return db.query(sql, [f"%{keyword}%", f"%{keyword}%"])
 
+
 def get_users():
     sql = "SELECT id, username FROM users"
     return db.query(sql)
 
 def get_user_threads():
     sql = """
-        SELECT p.id, p.title, p.user_id, COUNT(m.id) AS message_count
+        SELECT p.id, p.title, p.user_id, p.type AS category, COUNT(m.id) AS message_count
         FROM posts p
         LEFT JOIN messages m ON p.id = m.post_id
         GROUP BY p.id

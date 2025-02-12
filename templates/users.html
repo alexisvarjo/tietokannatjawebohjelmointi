@@ -3,17 +3,6 @@
     <head>
         <title>Ilmoitukset</title>
     </head>
-
-    <nav>
-        <ul style="list-style-type: none; display: inline-flex">
-            <li><a href="/">Home</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/about">About</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/users">Users</a></li>
-        </ul>
-    </nav>
-
     <body>
         <h1>Ilmoitukset</h1>
         <table>
@@ -21,6 +10,7 @@
                 <th>Nimi</th>
                 <th>Ilmoituksen otsikko</th>
                 <th>Viestejä</th>
+                <th>Ilmoituksen tyyppi</th>
             </tr>
             {% for user in users %} {% for thread in user.threads %}
             <tr>
@@ -29,6 +19,7 @@
                     <a href="{{ thread.url }}">{{ thread.title }}</a>
                 </td>
                 <td>{{ thread.message_count }}</td>
+                <td>{{ thread.category }}</td>
             </tr>
             {% endfor %} {% endfor %}
         </table>

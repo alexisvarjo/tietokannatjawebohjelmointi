@@ -1,9 +1,8 @@
 <!doctype html>
 <html>
     <head>
-        <title>Kirjautuminen</title>
+        <title>Ilmoitukset</title>
     </head>
-
     <nav>
         <ul style="list-style-type: none; display: inline-flex">
             <li><a href="/">Home</a></li>
@@ -14,47 +13,28 @@
         </ul>
     </nav>
     <body>
-        {% if session.username %}
-        <p>Olet kirjautunut nimellä {{ session.username }}</p>
-        <p>
-            <a href="/logout">Kirjaudu ulos</a>
-        </p>
-        {% else %}
-        <form action="/login" method="post">
-            <p>
-                Tunnus: <br />
-                <input type="text" name="username" />
-            </p>
-            <p>
-                Salasana: <br />
-                <input type="password" name="password" />
-            </p>
-            <input type="submit" value="Kirjaudu" />
-        </form>
-        {% endif %} {% for thread in threads %}
+        <h1>Ilmoitukset</h1>
+        {% for thread in threads %}
         <p>
             <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
             <br />
-            {{ thread.total }} viestiä, uusin {{ thread.last }}
+            {{ thread.category }} <br />
+            {{ thread.total }} viestiä, uusin: {{ thread.last }}
         </p>
         <hr />
         {% endfor %} {% if session.user_id %}
-        <a href="new_thread">
+        <a href="/new_thread">
             <button type="button">Uusi ilmoitus</button>
         </a>
-
-        {% endif %}
-        <br />
-        <br />
+        {% endif %} {% if not session.username %}
+        <br /><br />
         <a href="/register">
-            <button type="button">rekisteröidy</button>
-            <br />
-            <br />
-            <br />
-            <br />
+            <button type="button">Rekisteröidy</button>
         </a>
+        {% endif %}
+        <br /><br />
         <a href="/search">
-            <button type="button">haku</button>
+            <button type="button">Haku</button>
         </a>
     </body>
 </html>

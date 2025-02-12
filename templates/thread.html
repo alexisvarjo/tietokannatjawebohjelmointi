@@ -1,39 +1,43 @@
-<nav>
-    <ul style="list-style-type: none; display: inline-flex">
-        <li><a href="/">Home</a></li>
-        <li>&nbsp;&nbsp;</li>
-        <li><a href="/about">About</a></li>
-        <li>&nbsp;&nbsp;</li>
-        <li><a href="/users">Users</a></li>
-    </ul>
-</nav>
+<!doctype html>
+<html>
+    <head>
+        <title>{{ thread.title }}</title>
+    </head>
+    <body>
+        <nav>
+            <ul style="list-style-type: none; display: inline-flex">
+                <li><a href="/">Home</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/about">About</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
+        <h1>{{ thread.title }}</h1>
+        <p>Kategoria: {{ thread.category }}</p>
 
-{% for message in messages %}
-<p>{{ message.username }} ({{ message.sent_at }}):</p>
-<p>{{ message.content }}</p>
-{% if message.user_id == session.user_id %}
-<p>
-    <a href="/edit/{{ message.id }}">Muokkaa</a> |
-    <a href="/remove/{{ message.id }}">Poista</a>
-</p>
-{% endif %}
-<hr />
-{% endfor %} {% if session.user_id %}
-<h2>Uusi viesti</h2>
-
-<form action="/new_message" method="post">
-    <p>
-        Viesti:<br />
-        <textarea name="content" rows="5" cols="40"></textarea>
-    </p>
-    <p>Valitse ilmoituksen tyyppi:</p>
-    <p>
-        <input type="radio" name="category" value="1" /> Myynti
-        <input type="radio" name="category" value="2" /> Osto
-        <input type="radio" name="category" value="3" /> Vaihto
-    </p>
-    <input type="hidden" name="post_id" value="{{ thread.id }}" />
-    <input type="submit" value="Lähetä" />
-</form>
-<hr />
-{% endif %}
+        <!-- Display messages -->
+        {% for message in messages %}
+        <p>{{ message.username }} ({{ message.sent_at }}):</p>
+        <p>{{ message.content }}</p>
+        {% if message.user_id == session.user_id %}
+        <p>
+            <a href="/edit/{{ message.id }}">Muokkaa</a> |
+            <a href="/remove/{{ message.id }}">Poista</a>
+        </p>
+        {% endif %}
+        <hr />
+        {% endfor %} {% if session.user_id %}
+        <h2>Uusi viesti</h2>
+        <form action="/new_message" method="post">
+            <p>
+                Viesti:<br />
+                <textarea name="content" rows="5" cols="40"></textarea>
+            </p>
+            <!-- The category does not change on new message; it's already set in the thread -->
+            <input type="hidden" name="post_id" value="{{ thread.id }}" />
+            <input type="submit" value="Lähetä" />
+        </form>
+        {% endif %}
+    </body>
+</html>
