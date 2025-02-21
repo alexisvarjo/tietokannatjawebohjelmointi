@@ -35,9 +35,22 @@
             <textarea name="content" rows="5" cols="40">{{ content|default('') }}</textarea>
         </p>
 
-        <p>
-            <label for="fileInput">Kuva:</label><br/>
-            <input type="file" id="fileInput" name="image" accept="image/*" required />
+                <p>
+            <label for="fileInput">Kuva(t):</label><br/>
+            <!--
+               "multiple" allows selecting more than one file.
+               The name "images" (with or without [] brackets) will let you handle
+               multiple files on the server side via `request.files.getlist("images")`.
+            -->
+            <input
+                type="file"
+                id="fileInput"
+                name="images"
+                accept="image/*"
+                multiple
+                required
+            />
+            <br/><small>Valitse vähintään yksi kuva. Voit valita useita kuvia (esim. Ctrl- tai Shift-näppäimellä).</small>
         </p>
 
         <p>
