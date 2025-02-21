@@ -124,7 +124,8 @@ def show_thread(thread_id):
     thread = posts.get_thread(thread_id)
     messages = posts.get_messages(thread_id)
     pictures = posts.get_pictures(thread_id)
-    return render_template("thread.html", thread=thread, messages=messages, pictures=pictures)
+    price = posts.get_price(thread_id)
+    return render_template("thread.html", thread=thread, messages=messages, pictures=pictures, price=price)
 
 @app.route("/picture/<int:picture_id>")
 def serve_picture(picture_id):

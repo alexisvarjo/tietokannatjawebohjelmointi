@@ -116,3 +116,7 @@ def add_price(post_id, price, type):
     post_type = types[int(type)]
     sql = "INSERT INTO prices (post_id, price, type) VALUES (?, ?, ?)"
     db.execute(sql, [post_id, price, post_type])
+
+def get_price(post_id):
+    sql = "SELECT price FROM prices WHERE post_id = ?"
+    return db.query(sql, [post_id])[0][0]
