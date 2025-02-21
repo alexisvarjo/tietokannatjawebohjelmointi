@@ -87,6 +87,7 @@ def new_thread():
     if request.method == "GET":
         return render_template("new_thread.html")
 
+    price = int(request.form["price"])
     title = request.form["title"]
     content = request.form["content"]
     type = request.form["category"]
@@ -103,11 +104,16 @@ def new_thread():
     if not type or type not in ["1", "2", "3"]:
         return render_template("new_thread.html", error_message="VIRHE: Valitse kategoria", title=title, content=content, category=type)
 
+    if not price or price < 0:
+        return render_template("new_thread.html", error_message="VIRHE: Hinta puuttuu tai on negatiivinen", title=title, content=content, category=type)
+
     if "last_thread" in session and session["last_thread"] == (title, content, type):
         threads = posts.get_posts()
         return render_template("index.html", threads=threads, error_message="VIRHE: Sama viesti on jo lähetetty")
     else:
+        print(title, content, type, user_id)
         thread_id = posts.add_thread(title, content, user_id, type)
+        price = posts.add_price(thread_id, price, type)
         for image in images:
             posts.add_image(thread_id, image)
         session["last_thread"] = (title, content, type)

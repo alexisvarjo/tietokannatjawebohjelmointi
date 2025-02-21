@@ -26,3 +26,10 @@ CREATE TABLE pictures (
     post_id INTEGER REFERENCES posts,
     picture BLOB
 );
+
+CREATE TABLE prices (
+    id INTEGER PRIMARY KEY,
+    post_id INTEGER REFERENCES posts,
+    price REAL,
+    type TEXT
+);

@@ -110,3 +110,9 @@ def get_pictures(post_id):
 def get_single_picture(picture_id):
     sql = "SELECT picture FROM pictures WHERE id = ?"
     return db.query(sql, [picture_id])
+
+def add_price(post_id, price, type):
+    types = {1: "Myynti", 2: "Osto", 3: "Vaihto"}
+    post_type = types[int(type)]
+    sql = "INSERT INTO prices (post_id, price, type) VALUES (?, ?, ?)"
+    db.execute(sql, [post_id, price, post_type])

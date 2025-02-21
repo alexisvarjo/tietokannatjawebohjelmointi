@@ -31,6 +31,15 @@
         </p>
 
         <p>
+            Hinta: <br />
+            <input
+                type="number"
+                name="price"
+                value="{{ price|default('') }}"
+            />
+        </p>
+
+        <p>
             Viesti: <br />
             <textarea name="content" rows="5" cols="40">{{ content|default('') }}</textarea>
         </p>
