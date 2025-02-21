@@ -20,3 +20,9 @@ CREATE TABLE messages (
     post_id INTEGER REFERENCES posts,
     status INTEGER DEFAULT 1
 );
+
+CREATE TABLE pictures (
+    id INTEGER PRIMARY KEY,
+    post_id INTEGER REFERENCES posts,
+    picture BLOB
+);

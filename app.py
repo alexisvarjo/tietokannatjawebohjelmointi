@@ -91,6 +91,7 @@ def new_thread():
     content = request.form["content"]
     type = request.form["category"]
     user_id = session["user_id"]
+    image = request.files["image"]
 
     if not title or len(title) > 100:
         return render_template("new_thread.html", error_message="VIRHE: Otsikko puuttuu tai on yli 100 merkkiä pitkä", title=title, content=content, category=type)
@@ -104,6 +105,7 @@ def new_thread():
         return render_template("index.html", threads=threads, error_message="VIRHE: Sama viesti on jo lähetetty")
     else:
         thread_id = posts.add_thread(title, content, user_id, type)
+        posts.add_image(thread_id, image)
         session["last_thread"] = (title, content, type)
         return redirect("/thread/" + str(thread_id))
 

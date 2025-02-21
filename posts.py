@@ -16,9 +16,6 @@ def get_posts():
     """
     return db.query(sql)
 
-
-
-
 def add_thread(title, content, user_id, type):
     types = {1: "Myynti", 2: "Osto", 3: "Vaihto"}
     post_type = types[int(type)]
@@ -101,3 +98,7 @@ def get_user_threads():
         ORDER BY p.id DESC
     """
     return db.query(sql)
+
+def add_image(post_id, image):
+    sql = "INSERT INTO pictures (post_id, picture) VALUES (?, ?)"
+    db.execute(sql, [post_id, image.read()])
