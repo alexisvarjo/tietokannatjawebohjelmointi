@@ -39,39 +39,20 @@
                     type="radio"
                     name="category"
                     value="1"
-                    {%
-                    if
-                    category=""
-                    ="1"
-                    %}checked{%
-                    endif
-                    %}
-                />
+                    {% if category=="1" %} checked {%endif%}/>
                 Myynti
                 <input
                     type="radio"
                     name="category"
                     value="2"
-                    {%
-                    if
-                    category=""
-                    ="2"
-                    %}checked{%
-                    endif
-                    %}
+                    {% if category=="2" %}checked{%endif%}
                 />
                 Osto
                 <input
                     type="radio"
                     name="category"
                     value="3"
-                    {%
-                    if
-                    category=""
-                    ="3"
-                    %}checked{%
-                    endif
-                    %}
+                    {% if category=="3" %}checked{%endif%}
                 />
                 Vaihto
             </p>

@@ -31,9 +31,17 @@
         </a>
         {% endif %} {% if not session.username %}
         <br /><br />
+
+        <a href="/login">
+            <button type="button">Kirjaudu</button>
+        </a>
+
+        <br> <br/>
         <a href="/register">
             <button type="button">Rekisteröidy</button>
         </a>
+
+
         {% endif %}
 
         <br /><br />
