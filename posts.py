@@ -102,3 +102,11 @@ def get_user_threads():
 def add_image(post_id, image):
     sql = "INSERT INTO pictures (post_id, picture) VALUES (?, ?)"
     db.execute(sql, [post_id, image.read()])
+
+def get_pictures(post_id):
+    sql = "SELECT id, picture FROM pictures WHERE post_id = ?"
+    return db.query(sql, [post_id])
+
+def get_single_picture(picture_id):
+    sql = "SELECT picture FROM pictures WHERE id = ?"
+    return db.query(sql, [picture_id])

@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask
+from flask import Flask, abort, Response
 from flask import redirect, render_template, request
 from flask import session
 from werkzeug.security import generate_password_hash
@@ -113,7 +113,18 @@ def new_thread():
 def show_thread(thread_id):
     thread = posts.get_thread(thread_id)
     messages = posts.get_messages(thread_id)
-    return render_template("thread.html", thread=thread, messages=messages)
+    pictures = posts.get_pictures(thread_id)
+    return render_template("thread.html", thread=thread, messages=messages, pictures=pictures)
+
+@app.route("/picture/<int:picture_id>")
+def serve_picture(picture_id):
+    row = posts.get_single_picture(picture_id)
+    if not row:
+        abort(404)
+
+    # Return the image bytes with the appropriate MIME type.
+    return Response(row[0], mimetype="image/png")
+
 
 @app.route("/edit/<int:message_id>", methods=["GET", "POST"])
 def edit_message(message_id):

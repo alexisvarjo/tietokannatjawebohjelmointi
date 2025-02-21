@@ -16,6 +16,13 @@
         <h1>{{ thread.title }}</h1>
         <p>Kategoria: {{ thread.category }}</p>
 
+        {% for pic in pictures %}
+      <!-- Use url_for to generate /picture/<id> -->
+      <img src="{{ url_for('serve_picture', picture_id=pic.id) }}"
+           alt="Picture {{ pic.id }}">
+        <br/>
+        {% endfor %}
+
         <!-- Display messages -->
         {% for message in messages %}
         <p>{{ message.username }} ({{ message.sent_at }}):</p>
