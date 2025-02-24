@@ -88,7 +88,17 @@ def search(keyword):
             posts.title,
             posts.type AS category,
             COUNT(messages.id) AS total_messages,
-            MAX(messages.sent_at) AS last_updated
+            MAX(messages.sent_at) AS last_updated,
+            (SELECT pic.id
+             FROM pictures pic
+             WHERE pic.post_id = posts.id
+             ORDER BY pic.id ASC
+             LIMIT 1) AS thumbnail,
+            (SELECT pr.price
+             FROM prices pr
+             WHERE pr.post_id = posts.id
+             ORDER BY pr.id ASC
+             LIMIT 1) AS price
         FROM posts
         LEFT JOIN messages ON posts.id = messages.post_id
         WHERE posts.title LIKE ? OR messages.content LIKE ?
@@ -96,7 +106,6 @@ def search(keyword):
         ORDER BY last_updated DESC
     """
     return db.query(sql, [f"%{keyword}%", f"%{keyword}%"])
-
 
 def get_users():
     sql = "SELECT id, username FROM users"
