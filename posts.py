@@ -87,6 +87,7 @@ def search(keyword):
             posts.id AS id,
             posts.title,
             posts.type AS category,
+            users.username AS username,
             COUNT(messages.id) AS total_messages,
             MAX(messages.sent_at) AS last_updated,
             (SELECT pic.id
@@ -101,6 +102,7 @@ def search(keyword):
              LIMIT 1) AS price
         FROM posts
         LEFT JOIN messages ON posts.id = messages.post_id
+        JOIN users ON posts.user_id = users.id
         WHERE posts.title LIKE ? OR messages.content LIKE ?
         GROUP BY posts.id
         ORDER BY last_updated DESC

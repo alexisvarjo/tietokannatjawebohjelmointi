@@ -56,6 +56,8 @@
                 €<br />
                 {{ thread.total_messages }} viestiä, viimeksi: {{
                 thread.last_updated }}
+                <br />
+                Käyttäjä: {{ thread.username }}<br />
             </div>
         </div>
         {% endfor %} {% else %} {% if keyword %}
