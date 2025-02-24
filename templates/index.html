@@ -14,16 +14,28 @@
     </nav>
     <body>
         <h1>Ilmoitukset</h1>
-
         {% if threads|length == 0 %}
         <p>Ei ilmoituksia</p>
         {% else %} {% for thread in threads %}
-        <p>
-            <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
-            <br />
-            {{ thread.category }} <br />
-            {{ thread.total }} viestiä, uusin: {{ thread.last }}
-        </p>
+        <div
+            style="display: flex; align-items: flex-start; margin-bottom: 20px"
+        >
+            {% if thread.thumbnail %}
+            <div style="flex: 0 0 auto; margin-right: 10px">
+                <img
+                    src="{{ url_for('serve_picture', picture_id=thread.thumbnail) }}"
+                    alt="Thumbnail"
+                    style="width: 100px; height: auto"
+                />
+            </div>
+            {% endif %}
+            <div style="flex: 1 1 auto">
+                <a href="/thread/{{ thread.id }}">{{ thread.title }}</a>
+                <br />
+                {{ thread.category }} <br />
+                {{ thread.total }} viestiä, uusin: {{ thread.last }}
+            </div>
+        </div>
         <hr />
         {% endfor %} {% endif %} {% if session.user_id %}
         <a href="/new_thread">
@@ -31,19 +43,14 @@
         </a>
         {% endif %} {% if not session.username %}
         <br /><br />
-
         <a href="/login">
             <button type="button">Kirjaudu</button>
         </a>
-
-        <br> <br/>
+        <br /><br />
         <a href="/register">
             <button type="button">Rekisteröidy</button>
         </a>
-
-
         {% endif %}
-
         <br /><br />
         <a href="/search">
             <button type="button">Haku</button>

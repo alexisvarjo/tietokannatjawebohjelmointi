@@ -47,6 +47,7 @@ def index():
     threads = posts.get_posts()
     return render_template("index.html", threads=threads)
 
+
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "GET":

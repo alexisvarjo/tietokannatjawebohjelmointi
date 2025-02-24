@@ -1,68 +1,68 @@
 <!doctype html>
 <html>
-<head>
-    <title>{{ thread.title }}</title>
-    <style>
-        /* Ensure images shrink on smaller screens */
-        #carousel img {
-            max-width: 100%; /* or a fixed max-width (e.g., 600px) if you prefer */
-            height: auto;
-            display: block;
-            margin: 0 auto; /* center in container */
-        }
+    <head>
+        <title>{{ thread.title }}</title>
+        <style>
+            /* Ensure images shrink on smaller screens */
+            #carousel img {
+                max-width: 100%; /* or a fixed max-width (e.g., 600px) if you prefer */
+                height: auto;
+                display: block;
+                margin: 0 auto; /* center in container */
+            }
 
-        #carousel-controls {
-            text-align: center;
-            margin: 10px;
-        }
+            #carousel-controls {
+                text-align: center;
+                margin: 10px;
+            }
 
-        .carousel-btn {
-            padding: 6px 12px;
-            margin: 0 5px;
-            cursor: pointer;
-        }
+            .carousel-btn {
+                padding: 6px 12px;
+                margin: 0 5px;
+                cursor: pointer;
+            }
 
-        /* Optional: style for the "Image X of Y" text */
-        #carousel-info {
-            text-align: center;
-            margin: 5px;
-            font-style: italic;
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <ul style="list-style-type: none; display: inline-flex">
-            <li><a href="/">Home</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/about">About</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/users">Users</a></li>
-        </ul>
-    </nav>
+            /* Optional: style for the "Image X of Y" text */
+            #carousel-info {
+                text-align: center;
+                margin: 5px;
+                font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <ul style="list-style-type: none; display: inline-flex">
+                <li><a href="/">Home</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/about">About</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
 
-    <h1>{{ thread.title }}</h1>
-    <p>{{ thread.category }} Hinta: {{ price }} €</p>
+        <h1>{{ thread.title }}</h1>
+        <p>{{ thread.category }} Hinta: {{ price }} €</p>
 
-    <!-- CAROUSEL SECTION -->
-    {% if pictures %}
-    <div id="carousel">
-        <!-- The currently-displayed image -->
-        <img id="carousel-image" src="" alt="Carousel Image">
+        <!-- CAROUSEL SECTION -->
+        {% if pictures %}
+        <div id="carousel">
+            <!-- The currently-displayed image -->
+            <img id="carousel-image" src="" alt="Carousel Image" />
 
-        <!-- Display how many images, and which image is shown -->
-        <div id="carousel-info"></div>
+            <!-- Display how many images, and which image is shown -->
+            <div id="carousel-info"></div>
 
-        <!-- Prev/Next buttons -->
-        <div id="carousel-controls">
-            <button class="carousel-btn" onclick="prevImage()">Prev</button>
-            <button class="carousel-btn" onclick="nextImage()">Next</button>
+            <!-- Prev/Next buttons -->
+            <div id="carousel-controls">
+                <button class="carousel-btn" onclick="prevImage()">Prev</button>
+                <button class="carousel-btn" onclick="nextImage()">Next</button>
+            </div>
         </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <!-- Display messages -->
-    {% for message in messages %}
+        <!-- Display messages -->
+        {% for message in messages %}
         <p>{{ message.username }} ({{ message.sent_at }}):</p>
         <p>{{ message.content }}</p>
         {% if message.user_id == session.user_id %}
@@ -72,62 +72,60 @@
         </p>
         {% endif %}
         <hr />
-    {% endfor %}
+        {% endfor %} {% if session.user_id %}
+        <h2>Uusi viesti</h2>
+        <form action="/new_message" method="post">
+            <p>
+                Viesti:<br />
+                <textarea name="content" rows="5" cols="40"></textarea>
+            </p>
+            <input type="hidden" name="post_id" value="{{ thread.id }}" />
+            <input type="submit" value="Lähetä" />
+        </form>
+        {% endif %}
 
-    {% if session.user_id %}
-    <h2>Uusi viesti</h2>
-    <form action="/new_message" method="post">
-        <p>
-            Viesti:<br />
-            <textarea name="content" rows="5" cols="40"></textarea>
-        </p>
-        <input type="hidden" name="post_id" value="{{ thread.id }}" />
-        <input type="submit" value="Lähetä" />
-    </form>
-    {% endif %}
+        <script>
+            // Create an array of image URLs from the pictures
+            var images = [
+                {% for pic in pictures %}
+                    "{{ url_for('serve_picture', picture_id=pic.id) }}",
+                {% endfor %}
+            ];
 
-    <script>
-        // Create an array of image URLs from the pictures
-        var images = [
-            {% for pic in pictures %}
-                "{{ url_for('serve_picture', picture_id=pic.id) }}",
-            {% endfor %}
-        ];
+            var currentIndex = 0;
+            var carouselImage = null;
+            var carouselInfo = null;
 
-        var currentIndex = 0;
-        var carouselImage = null;
-        var carouselInfo = null;
+            // Initialize the carousel on page load
+            window.onload = function() {
+                if (images.length > 0) {
+                    carouselImage = document.getElementById('carousel-image');
+                    carouselInfo = document.getElementById('carousel-info');
+                    showImage(currentIndex);
+                }
+            };
 
-        // Initialize the carousel on page load
-        window.onload = function() {
-            if (images.length > 0) {
-                carouselImage = document.getElementById('carousel-image');
-                carouselInfo = document.getElementById('carousel-info');
+            // Function to display an image by index
+            function showImage(index) {
+                // Update the <img> src
+                carouselImage.src = images[index];
+                // Update the "Image X of Y" text
+                if (carouselInfo) {
+                    carouselInfo.textContent = "Kuva " + (index + 1) + " / " + images.length;
+                }
+            }
+
+            // Show the previous image
+            function prevImage() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
                 showImage(currentIndex);
             }
-        };
 
-        // Function to display an image by index
-        function showImage(index) {
-            // Update the <img> src
-            carouselImage.src = images[index];
-            // Update the "Image X of Y" text
-            if (carouselInfo) {
-                carouselInfo.textContent = "Kuva " + (index + 1) + " / " + images.length;
+            // Show the next image
+            function nextImage() {
+                currentIndex = (currentIndex + 1) % images.length;
+                showImage(currentIndex);
             }
-        }
-
-        // Show the previous image
-        function prevImage() {
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
-            showImage(currentIndex);
-        }
-
-        // Show the next image
-        function nextImage() {
-            currentIndex = (currentIndex + 1) % images.length;
-            showImage(currentIndex);
-        }
-    </script>
-</body>
+        </script>
+    </body>
 </html>

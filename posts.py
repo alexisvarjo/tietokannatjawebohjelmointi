@@ -3,18 +3,25 @@ from flask import g
 import db
 from flask import Flask
 
-
-
 def get_posts():
     sql = """
-        SELECT p.id, p.title, p.type AS category,
-               COUNT(m.id) AS total, MAX(m.sent_at) AS last
+        SELECT p.id,
+               p.title,
+               p.type AS category,
+               COUNT(m.id) AS total,
+               MAX(m.sent_at) AS last,
+               (SELECT pic.id
+                FROM pictures pic
+                WHERE pic.post_id = p.id
+                ORDER BY pic.id ASC
+                LIMIT 1) AS thumbnail
         FROM posts p
         LEFT JOIN messages m ON p.id = m.post_id
         GROUP BY p.id
         ORDER BY p.id DESC
     """
     return db.query(sql)
+
 
 def add_thread(title, content, user_id, type):
     types = {1: "Myynti", 2: "Osto", 3: "Vaihto"}
