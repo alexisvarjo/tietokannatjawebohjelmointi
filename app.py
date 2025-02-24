@@ -224,3 +224,7 @@ def users():
                 break
 
     return render_template("users.html", users=users_list)
+
+@app.route("/about", methods=["GET"])
+def about():
+    return render_template("about.html")
