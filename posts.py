@@ -14,13 +14,19 @@ def get_posts():
                 FROM pictures pic
                 WHERE pic.post_id = p.id
                 ORDER BY pic.id ASC
-                LIMIT 1) AS thumbnail
+                LIMIT 1) AS thumbnail,
+               (SELECT pr.price
+                FROM prices pr
+                WHERE pr.post_id = p.id
+                ORDER BY pr.id ASC
+                LIMIT 1) AS price
         FROM posts p
         LEFT JOIN messages m ON p.id = m.post_id
         GROUP BY p.id
         ORDER BY p.id DESC
     """
     return db.query(sql)
+
 
 
 def add_thread(title, content, user_id, type):
