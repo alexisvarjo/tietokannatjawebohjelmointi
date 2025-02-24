@@ -57,7 +57,9 @@
                 {{ thread.total_messages }} viestiä, viimeksi: {{
                 thread.last_updated }}
                 <br />
-                Käyttäjä: {{ thread.username }}<br />
+                Käyttäjä:
+                <a href="/user/{{ thread.user_id }}">{{ thread.username }}</a
+                ><br />
             </div>
         </div>
         {% endfor %} {% else %} {% if keyword %}

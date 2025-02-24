@@ -50,6 +50,11 @@
         <a href="/register">
             <button type="button">Rekisteröidy</button>
         </a>
+        {% endif %} {% if session.username %}
+        <br /><br />
+        <a href="/logout">
+            <button type="button">Kirjaudu ulos</button>
+        </a>
         {% endif %}
         <br /><br />
         <a href="/search">

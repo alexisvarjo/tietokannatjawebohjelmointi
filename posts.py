@@ -46,7 +46,8 @@ def add_message(content, user_id, thread_id):
 
 def get_thread(thread_id):
     sql = "SELECT id, title, type AS category FROM posts WHERE id = ?"
-    return db.query(sql, [thread_id])[0]
+    result = db.query(sql, [thread_id])[0]
+    return result if result else None
 
 
 def get_messages(thread_id):
@@ -69,7 +70,7 @@ def remove_message(message_id):
     db.execute(sql, [message_id])
 
 def get_message(message_id):
-    sql = "SELECT id, content, post_id FROM messages WHERE id = ?"
+    sql = "SELECT id, content, post_id, user_id FROM messages WHERE id = ?"
     result = db.query(sql, [message_id])
 
     if result:
@@ -90,6 +91,7 @@ def search(keyword):
             users.username AS username,
             COUNT(messages.id) AS total_messages,
             MAX(messages.sent_at) AS last_updated,
+            posts.user_id AS user_id,
             (SELECT pic.id
              FROM pictures pic
              WHERE pic.post_id = posts.id
@@ -133,7 +135,8 @@ def get_pictures(post_id):
 
 def get_single_picture(picture_id):
     sql = "SELECT picture FROM pictures WHERE id = ?"
-    return db.query(sql, [picture_id])
+    result = db.query(sql, [picture_id])
+    return result if result else None
 
 def add_price(post_id, price, type):
     types = {1: "Myynti", 2: "Osto", 3: "Vaihto"}
@@ -144,3 +147,19 @@ def add_price(post_id, price, type):
 def get_price(post_id):
     sql = "SELECT price FROM prices WHERE post_id = ?"
     return db.query(sql, [post_id])[0][0]
+
+def get_user(user_id):
+    sql = "SELECT username FROM users WHERE id = ?"
+    result = db.query(sql, [user_id])
+    return result[0] if result else None
+
+def get_messages_byuser(user_id):
+    sql = """SELECT m.id,
+                    m.thread_id,
+                    t.title thread_title,
+                    m.sent_at
+             FROM threads t, messages m
+             WHERE t.id = m.thread_id AND
+                   m.user_id = ?
+             ORDER BY m.sent_at DESC"""
+    return db.query(sql, [user_id])

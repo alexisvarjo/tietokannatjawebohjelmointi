@@ -85,6 +85,7 @@ def logout():
 
 @app.route("/new_thread", methods=["POST", "GET"])
 def new_thread():
+    require_login()
     if request.method == "GET":
         return render_template("new_thread.html")
 
@@ -123,6 +124,8 @@ def new_thread():
 @app.route("/thread/<int:thread_id>")
 def show_thread(thread_id):
     thread = posts.get_thread(thread_id)
+    if not thread:
+        abort(404)
     messages = posts.get_messages(thread_id)
     pictures = posts.get_pictures(thread_id)
     price = posts.get_price(thread_id)
@@ -140,8 +143,10 @@ def serve_picture(picture_id):
 
 @app.route("/edit/<int:message_id>", methods=["GET", "POST"])
 def edit_message(message_id):
+    require_login()
     message = posts.get_message(message_id)
-
+    if message["user_id"] != session["user_id"]:
+        abort(403)
     if request.method == "GET":
         return render_template("edit.html", message=message)
 
@@ -172,6 +177,7 @@ def search():
 
 @app.route("/remove/<int:message_id>", methods=["GET", "POST"])
 def remove_message(message_id):
+    require_login()
     message = posts.get_message(message_id)
     message_count = posts.count_messages(message["post_id"])
 
@@ -190,6 +196,7 @@ def remove_message(message_id):
 
 @app.route("/new_message", methods=["POST"])
 def new_message():
+    require_login()
     content = request.form["content"]
     user_id = session["user_id"]
     thread_id = request.form["post_id"]
@@ -204,8 +211,11 @@ def new_message():
         messages = posts.get_messages(thread_id)
         return render_template("thread.html", thread=thread, messages=messages, error_message="VIRHE: Sama viesti on jo lähetetty")
     else:
-        posts.add_message(content, user_id, thread_id)
-        session["last_message"] = (content, thread_id)
+        try:
+            posts.add_message(content, user_id, thread_id)
+            session["last_message"] = (content, thread_id)
+        except sqlite3.IntegrityError:
+            abort(403)
         return redirect("/thread/" + str(thread_id))
 
 @app.route("/users", methods=["GET"])
@@ -228,3 +238,15 @@ def users():
 @app.route("/about", methods=["GET"])
 def about():
     return render_template("about.html")
+
+def require_login():
+    if "user_id" not in session:
+        abort(403)
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = posts.get_user(user_id)
+    if not user:
+        abort(404)
+    messages = posts.get_messages(user_id)
+    return render_template("user.html", user=user, messages=messages)
