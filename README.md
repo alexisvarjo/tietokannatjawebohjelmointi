@@ -1,4 +1,4 @@
-# Esimerkkisovellus
+# häikäilemätön Nettiauto-kopio
 
 Harjoitustyöni on käytettyjen autojen myyntiin, vaihtoon ja ostoon  tarkoitettu nettisivu,
 jossa on tällä hetkellä seuraavat toiminnot:
