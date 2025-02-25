@@ -14,29 +14,34 @@
             </ul>
         </nav>
 
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+
         <!-- SINGLE form with enctype="multipart/form-data" -->
         <form action="/new_thread" method="POST" enctype="multipart/form-data">
             <p>
                 Otsikko: <br />
-                <input
-                    type="text"
-                    name="title"
-                    value="{{ title|default('') }}"
-                />
+                <input type="text" name="title" value="{{ filled.title }}" />
             </p>
 
             <p>
                 Hinta: <br />
-                <input
-                    type="number"
-                    name="price"
-                    value="{{ price|default('') }}"
-                />
+                <input type="number" name="price" value="{{ filled.price }}" />
             </p>
 
             <p>
                 Viesti: <br />
-                <textarea name="content" rows="5" cols="40">
+                <textarea
+                    name="content"
+                    value="{{ filled.content}} "
+                    rows="5"
+                    cols="40"
+                >
 {{ content|default('') }}</textarea
                 >
             </p>
@@ -70,7 +75,7 @@
                     value="1"
                     {%
                     if
-                    category=""
+                    filled.category=""
                     ="1"
                     %}
                     checked
@@ -83,7 +88,7 @@
                     value="2"
                     {%
                     if
-                    category=""
+                    filled.category=""
                     ="2"
                     %}
                     checked
@@ -96,7 +101,7 @@
                     value="3"
                     {%
                     if
-                    category=""
+                    filled.category=""
                     ="3"
                     %}
                     checked

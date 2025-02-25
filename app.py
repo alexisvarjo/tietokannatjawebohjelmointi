@@ -2,7 +2,7 @@ import sqlite3
 import math
 from flask import Flask, abort, Response
 from flask import redirect, render_template, request
-from flask import session
+from flask import session, flash
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 import db
@@ -13,38 +13,41 @@ app = Flask(__name__)
 
 app.secret_key = config.secret_key
 
-@app.route("/register")
-def register():
-    return render_template("register.html")
+@app.route("/create", methods=["POST", "GET"])
+def create(filled={}):
+    if request.method == "GET":
+        return render_template("register.html", filled=filled)
 
-@app.route("/create", methods=["POST"])
-def create():
-    username = request.form["username"]
-    password1 = request.form["password1"]
-    password2 = request.form["password2"]
+    if request.method == "POST":
+        username = request.form["username"]
+        password1 = request.form["password1"]
+        password2 = request.form["password2"]
 
-    if not username or len(username) > 50:
-        flash("VIRHE: Käyttäjänimi on tyhjä tai yli 50 merkkiä")
-        return render_template("register.html")
-    if not password1 or len(password1) > 100:
-        flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
-        return render_template("register.html")
-    if not password2 or len(password2) > 100:
-        flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
-        return render_template("register.html")
-    if password1 != password2:
-        flash("VIRHE: Salasanat eivät täsmää")
-        return render_template("register.html")
+        filled = {"username": username, "password1": password1, "password2": password2}
 
-    password_hash = generate_password_hash(password1)
+        if not username or len(username) > 50:
+            flash("VIRHE: Käyttäjänimi on tyhjä tai yli 50 merkkiä")
+            return render_template("register.html", filled=filled)
+        if not password1 or len(password1) > 100:
+            flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
+            return render_template("register.html", filled=filled)
+        if not password2 or len(password2) > 100:
+            flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
+            return render_template("register.html", filled=filled)
+        if password1 != password2:
+            flash("VIRHE: Salasanat eivät täsmää")
+            return render_template("register.html", filled=filled)
 
-    try:
-        sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
-        db.execute(sql, [username, password_hash])
-    except sqlite3.IntegrityError:
-        return render_template("register.html", error_message="VIRHE: Tunnus on jo varattu", username=username)
+        password_hash = generate_password_hash(password1)
 
-    return render_template("register_success.html")
+        try:
+            sql = "INSERT INTO users (username, password_hash) VALUES (?, ?)"
+            db.execute(sql, [username, password_hash])
+        except sqlite3.IntegrityError:
+            flash("VIRHE: Tunnus on jo varattu")
+            return redirect("/create")
+
+        return render_template("register_success.html")
 
 
 @app.route("/")
@@ -64,26 +67,26 @@ def index(page=1):
 
 
 @app.route("/login", methods=["POST", "GET"])
-def login():
+def login(filled={}):
     if request.method == "GET":
         return render_template("login.html")
 
     username = request.form["username"]
     password = request.form["password"]
-
+    filled = {"username": username}
     if not username or len(username) > 50:
         flash("VIRHE: Käyttäjänimi puuttuu tai on liian pitkä")
-        return render_template("login.html")
+        return redirect("/login")
     if not password or len(password) > 100:
         flash("VIRHE: Salasana puuttuu tai on liian pitkä")
-        return render_template("login.html", username=username)
+        return render_template("login.html", filled=filled)
 
     sql = "SELECT id, password_hash FROM users WHERE username = ?"
     result = db.query(sql, [username])
 
     if not result:
         flash("VIRHE: Salasana tai käyttäjänimi on väärä")
-        return render_template("login.html", username=username)
+        return redirect("/login")
 
     user_id, password_hash = result[0]
 
@@ -94,7 +97,7 @@ def login():
         return redirect("/")
     else:
         flash("VIRHE: Salasana tai käyttäjänimi on väärä")
-        return render_template("login.html", username=username)
+        return redirect("/login")
 
 
 @app.route("/logout")
@@ -104,7 +107,7 @@ def logout():
 
 
 @app.route("/new_thread", methods=["POST", "GET"])
-def new_thread():
+def new_thread(filled={}):
     require_login()
     check_csrf()
     if request.method == "GET":
@@ -116,29 +119,33 @@ def new_thread():
     type = request.form["category"]
     user_id = session["user_id"]
     images = request.files.getlist("images")
+    filled = {"price": price, "title": title, "content": content, "type": type, "user_id": user_id}
 
     if len(images) == 0:
         flash("VIRHE: Valitse vähintään yksi kuva")
-        return render_template("new_thread.html")
+        return render_template("new_thread.html", filled)
 
     if not title or len(title) > 100:
         flash("VIRHE: Otsikko puuttuu tai on yli 100 merkkiä pitkä")
-        return render_template("new_thread.html", title=title, content=content, category=type)
+        if title:
+            filled["title"] = title[0:99]
+        return render_template("new_thread.html", filled)
     if not content or len(content) > 2000:
+        if content:
+            filled["content"] = content[0:1999]
         flash("VIRHE: Sisältö puuttuu tai on yli 2000 merkkiä pitkä")
-        return render_template("new_thread.html", title=title, content=content, category=type)
+        return render_template("new_thread.html", filled)
     if not type or type not in ["1", "2", "3"]:
         flash("VIRHE: Valitse kategoria")
-        return render_template("new_thread.html", title=title, content=content, category=type)
+        return redirect("/new_thread")
 
     if not price or price < 0:
         flash("VIRHE: Hinta puuttuu tai on negatiivinen")
         return render_template("new_thread.html", title=title, content=content, category=type)
 
     if "last_thread" in session and session["last_thread"] == (title, content, type):
-        threads = posts.get_posts()
         flash("VIRHE: Sama viesti on jo lähetetty")
-        return render_template("index.html", threads=threads)
+        return redirect("/")
     else:
         print(title, content, type, user_id)
         thread_id = posts.add_thread(title, content, user_id, type)
@@ -237,13 +244,13 @@ def new_message():
         thread = posts.get_thread(thread_id)
         messages = posts.get_messages(thread_id)
         flash("VIRHE: Viesti puuttuu tai on liian pitkä")
-        return render_template("thread.html", thread=thread, messages=messages)
+        return redirect("/new_message")
 
     if "last_message" in session and session["last_message"] == (content, thread_id):
         thread = posts.get_thread(thread_id)
         messages = posts.get_messages(thread_id)
         flash("VIRHE: Sama viesti on jo lähetetty")
-        return render_template("thread.html", thread=thread, messages=messages)
+        return redirect("/thread/" + str(thread_id))
     else:
         try:
             posts.add_message(content, user_id, thread_id)

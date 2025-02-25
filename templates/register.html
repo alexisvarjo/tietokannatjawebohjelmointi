@@ -14,23 +14,42 @@
             </ul>
         </nav>
 
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+
         <form action="/create" method="post">
             <p>
                 Tunnus: <br />
                 <input
                     type="text"
                     name="username"
-                    value="{{ username|default('') }}"
+                    value="{{ filled.username }} "
+                    maxlength="50"
                     required
                 />
             </p>
             <p>
                 Salasana: <br />
-                <input type="password" name="password1" required />
+                <input
+                    type="password"
+                    name="password1"
+                    value="{{ filled.password1 }}"
+                    required
+                />
             </p>
             <p>
                 Salasana uudestaan: <br />
-                <input type="password" name="password2" required />
+                <input
+                    type="password"
+                    name="password2"
+                    value="{{ filled.password2 }}"
+                    required
+                />
             </p>
             <input type="submit" value="Luo tunnus" />
         </form>
