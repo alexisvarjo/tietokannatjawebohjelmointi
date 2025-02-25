@@ -121,7 +121,7 @@
     <!-- Display messages -->
     {% for message in messages %}
     <div class="message">
-      <p><strong>{{ message.username }}</strong> ({{ message.sent_at }}):</p>
+      <p><strong><a href="/user/{{ message.user_id }}">{{ message.username }}</a></strong> ({{ message.sent_at }}):</p>
       <p>{{ message.content | show_lines }}</p>
       {% if message.user_id == session.user_id %}
       <p>
