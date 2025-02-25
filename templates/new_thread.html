@@ -83,39 +83,21 @@
                     type="radio"
                     name="category"
                     value="1"
-                    {%
-                    if
-                    filled.category=""
-                    ="1"
-                    %}
-                    checked
-                    {%endif%}
+                    {% if filled.category == "1" %} checked {% endif %}
                 />
                 Myynti
                 <input
                     type="radio"
                     name="category"
                     value="2"
-                    {%
-                    if
-                    filled.category=""
-                    ="2"
-                    %}
-                    checked
-                    {%endif%}
+                    {% if filled.category == "2" %} checked {% endif %}
                 />
                 Osto
                 <input
                     type="radio"
                     name="category"
                     value="3"
-                    {%
-                    if
-                    filled.category=""
-                    ="3"
-                    %}
-                    checked
-                    {%endif%}
+                    {% if filled.category == "3" %} checked {% endif %}
                 />
                 Vaihto
             </p>

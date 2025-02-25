@@ -19,7 +19,7 @@
 {% endif %}
 <ul>
     {% for message in messages %}
-        Ilmoitus: <a href="/thread/{{ message.thread_id }}#{{ message.id }}">
+        Ilmoitus: <a href="/thread/{{ message.post_id }}#{{ message.id }}">
             {{ message.thread_title }}
         </a>
         <br>
