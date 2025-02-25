@@ -178,7 +178,6 @@ def serve_picture(picture_id):
 @app.route("/edit/<int:message_id>", methods=["GET", "POST"])
 def edit_message(message_id):
     require_login()
-    check_csrf()
     message = posts.get_message(message_id)
     if message["user_id"] != session["user_id"]:
         abort(403)
@@ -186,6 +185,7 @@ def edit_message(message_id):
         return render_template("edit.html", message=message)
 
     if request.method == "POST":
+        check_csrf()
         content = request.form["content"]
 
         if not content or len(content) > 2000:
@@ -216,6 +216,8 @@ def search():
 def remove_message(message_id):
     require_login()
     message = posts.get_message(message_id)
+    if message["user_id"] != session["user_id"]:
+        abort(403)
     message_count = posts.count_messages(message["post_id"])
 
     if request.method == "GET":
