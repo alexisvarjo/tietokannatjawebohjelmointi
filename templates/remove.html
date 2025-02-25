@@ -9,6 +9,7 @@
 </nav>
 
 <form action="/remove/{{ message.id }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
     <p>Haluatko varmasti poistaa viestin?</p>
     <input type="submit" name="continue" value="Jatka" />
     <input type="submit" name="cancel" value="Peruuta" />

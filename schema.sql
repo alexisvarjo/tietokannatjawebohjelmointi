@@ -12,6 +12,19 @@ CREATE TABLE posts (
     content TEXT
 );
 
+CREATE TABLE pictures (
+    id INTEGER PRIMARY KEY,
+    post_id INTEGER REFERENCES posts ON DELETE CASCADE,
+    picture BLOB
+);
+
+CREATE TABLE prices (
+    id INTEGER PRIMARY KEY,
+    post_id INTEGER REFERENCES posts ON DELETE CASCADE,
+    price REAL,
+    type TEXT
+);
+
 CREATE TABLE messages (
     id INTEGER PRIMARY KEY,
     content TEXT,
@@ -19,19 +32,6 @@ CREATE TABLE messages (
     user_id INTEGER REFERENCES users,
     post_id INTEGER REFERENCES posts,
     status INTEGER DEFAULT 1
-);
-
-CREATE TABLE pictures (
-    id INTEGER PRIMARY KEY,
-    post_id INTEGER REFERENCES posts,
-    picture BLOB
-);
-
-CREATE TABLE prices (
-    id INTEGER PRIMARY KEY,
-    post_id INTEGER REFERENCES posts,
-    price REAL,
-    type TEXT
 );
 
 -- messages

@@ -214,7 +214,6 @@ def search():
 @app.route("/remove/<int:message_id>", methods=["GET", "POST"])
 def remove_message(message_id):
     require_login()
-    check_csrf()
     message = posts.get_message(message_id)
     message_count = posts.count_messages(message["post_id"])
 
@@ -222,6 +221,7 @@ def remove_message(message_id):
         return render_template("remove.html", message=message)
 
     if request.method == "POST":
+        check_csrf()
         if "continue" in request.form:
             posts.remove_message(message["id"])
             if message_count == 1:

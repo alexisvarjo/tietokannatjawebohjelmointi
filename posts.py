@@ -88,8 +88,18 @@ def get_message(message_id):
         return None  # Handle the case where no message exists with the given ID
 
 def remove_thread(thread_id):
+    # Remove associated pictures
+    sql = "DELETE FROM pictures WHERE post_id = ?"
+    db.execute(sql, [thread_id])
+
+    # Remove associated prices
+    sql = "DELETE FROM prices WHERE post_id = ?"
+    db.execute(sql, [thread_id])
+
+    # Finally, remove the thread (post)
     sql = "DELETE FROM posts WHERE id = ?"
     db.execute(sql, [thread_id])
+
 
 def search(keyword):
     sql = """
