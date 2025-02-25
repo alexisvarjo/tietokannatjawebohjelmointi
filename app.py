@@ -24,13 +24,17 @@ def create():
     password2 = request.form["password2"]
 
     if not username or len(username) > 50:
-        return render_template("register.html", error_message="VIRHE: Käyttäjänimi on tyhjä tai yli 50 merkkiä", username=username)
+        flash("VIRHE: Käyttäjänimi on tyhjä tai yli 50 merkkiä")
+        return render_template("register.html")
     if not password1 or len(password1) > 100:
-        return render_template("register.html", error_message="VIRHE: Salasana on tyhjä tai yli 100 merkkiä", username=username)
+        flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
+        return render_template("register.html")
     if not password2 or len(password2) > 100:
-        return render_template("register.html", error_message="VIRHE: Salasana on tyhjä tai yli 100 merkkiä", username=username)
+        flash("VIRHE: Salasana on tyhjä tai yli 100 merkkiä")
+        return render_template("register.html")
     if password1 != password2:
-        return render_template("register.html", error_message="VIRHE: Salasanat eivät täsmää", username=username)
+        flash("VIRHE: Salasanat eivät täsmää")
+        return render_template("register.html")
 
     password_hash = generate_password_hash(password1)
 
@@ -68,15 +72,18 @@ def login():
     password = request.form["password"]
 
     if not username or len(username) > 50:
-        return render_template("login.html", error_message="VIRHE: Käyttäjänimi puuttuu tai on liian pitkä", username=username)
+        flash("VIRHE: Käyttäjänimi puuttuu tai on liian pitkä")
+        return render_template("login.html")
     if not password or len(password) > 100:
-        return render_template("login.html", error_message="VIRHE: Salasana puuttuu tai on liian pitkä", username=username)
+        flash("VIRHE: Salasana puuttuu tai on liian pitkä")
+        return render_template("login.html", username=username)
 
     sql = "SELECT id, password_hash FROM users WHERE username = ?"
     result = db.query(sql, [username])
 
     if not result:
-        return render_template("login.html", error_message="VIRHE: Salasana tai käyttäjänimi on väärä", username=username)
+        flash("VIRHE: Salasana tai käyttäjänimi on väärä")
+        return render_template("login.html", username=username)
 
     user_id, password_hash = result[0]
 
@@ -86,7 +93,8 @@ def login():
         session["csrf_token"] = secrets.token_hex(16)
         return redirect("/")
     else:
-        return render_template("login.html", error_message="VIRHE: Salasana tai käyttäjänimi on väärä", username=username)
+        flash("VIRHE: Salasana tai käyttäjänimi on väärä")
+        return render_template("login.html", username=username)
 
 
 @app.route("/logout")
@@ -110,21 +118,27 @@ def new_thread():
     images = request.files.getlist("images")
 
     if len(images) == 0:
-        return render_template("new_thread.html", error_message="VIRHE: Valitse vähintään yksi kuva")
+        flash("VIRHE: Valitse vähintään yksi kuva")
+        return render_template("new_thread.html")
 
     if not title or len(title) > 100:
-        return render_template("new_thread.html", error_message="VIRHE: Otsikko puuttuu tai on yli 100 merkkiä pitkä", title=title, content=content, category=type)
+        flash("VIRHE: Otsikko puuttuu tai on yli 100 merkkiä pitkä")
+        return render_template("new_thread.html", title=title, content=content, category=type)
     if not content or len(content) > 2000:
-        return render_template("new_thread.html", error_message="VIRHE: Sisältö puuttuu tai on yli 2000 merkkiä pitkä", title=title, content=content, category=type)
+        flash("VIRHE: Sisältö puuttuu tai on yli 2000 merkkiä pitkä")
+        return render_template("new_thread.html", title=title, content=content, category=type)
     if not type or type not in ["1", "2", "3"]:
-        return render_template("new_thread.html", error_message="VIRHE: Valitse kategoria", title=title, content=content, category=type)
+        flash("VIRHE: Valitse kategoria")
+        return render_template("new_thread.html", title=title, content=content, category=type)
 
     if not price or price < 0:
-        return render_template("new_thread.html", error_message="VIRHE: Hinta puuttuu tai on negatiivinen", title=title, content=content, category=type)
+        flash("VIRHE: Hinta puuttuu tai on negatiivinen")
+        return render_template("new_thread.html", title=title, content=content, category=type)
 
     if "last_thread" in session and session["last_thread"] == (title, content, type):
         threads = posts.get_posts()
-        return render_template("index.html", threads=threads, error_message="VIRHE: Sama viesti on jo lähetetty")
+        flash("VIRHE: Sama viesti on jo lähetetty")
+        return render_template("index.html", threads=threads)
     else:
         print(title, content, type, user_id)
         thread_id = posts.add_thread(title, content, user_id, type)
@@ -168,7 +182,8 @@ def edit_message(message_id):
         content = request.form["content"]
 
         if not content or len(content) > 2000:
-            return "VIRHE: Sisältö puuttuu tai on liian pitkä"
+            flash("VIRHE: Sisältö puuttuu tai on liian pitkä")
+            return redirect("/edit/" + str(message_id))
 
         posts.update_message(message["id"], content)
         return redirect("/thread/" + str(message["post_id"]))
@@ -183,7 +198,8 @@ def search():
         keyword = request.form["keyword"]
 
         if not keyword or len(keyword) > 200:
-            return render_template("search.html", error_message="VIRHE: Hakusana puuttuu tai on liian pitkä", keyword=keyword)
+            flash("VIRHE: Hakusana puuttuu tai on liian pitkä")
+            return redirect("/search")
 
         threads = posts.search(keyword)
         return render_template("search.html", keyword=keyword, threads=threads)
@@ -220,12 +236,14 @@ def new_message():
     if not content or len(content) > 2000:
         thread = posts.get_thread(thread_id)
         messages = posts.get_messages(thread_id)
-        return render_template("thread.html", thread=thread, messages=messages, error_message="VIRHE: Viesti puuttuu tai on liian pitkä")
+        flash("VIRHE: Viesti puuttuu tai on liian pitkä")
+        return render_template("thread.html", thread=thread, messages=messages)
 
     if "last_message" in session and session["last_message"] == (content, thread_id):
         thread = posts.get_thread(thread_id)
         messages = posts.get_messages(thread_id)
-        return render_template("thread.html", thread=thread, messages=messages, error_message="VIRHE: Sama viesti on jo lähetetty")
+        flash("VIRHE: Sama viesti on jo lähetetty")
+        return render_template("thread.html", thread=thread, messages=messages)
     else:
         try:
             posts.add_message(content, user_id, thread_id)

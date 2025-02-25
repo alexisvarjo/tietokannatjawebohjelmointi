@@ -1,93 +1,111 @@
 <!doctype html>
 <html>
-<head>
-    <title>Uusi ilmoitus</title>
-</head>
-<body>
-    <nav>
-        <ul style="list-style-type: none; display: inline-flex">
-            <li><a href="/">Home</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/about">About</a></li>
-            <li>&nbsp;&nbsp;</li>
-            <li><a href="/users">Users</a></li>
-        </ul>
-    </nav>
+    <head>
+        <title>Uusi ilmoitus</title>
+    </head>
+    <body>
+        <nav>
+            <ul style="list-style-type: none; display: inline-flex">
+                <li><a href="/">Home</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/about">About</a></li>
+                <li>&nbsp;&nbsp;</li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </nav>
 
-    <!-- Display error message if exists -->
-    {% if error_message %}
-    <p style="color: red">{{ error_message }}</p>
-    {% endif %}
+        <!-- SINGLE form with enctype="multipart/form-data" -->
+        <form action="/new_thread" method="POST" enctype="multipart/form-data">
+            <p>
+                Otsikko: <br />
+                <input
+                    type="text"
+                    name="title"
+                    value="{{ title|default('') }}"
+                />
+            </p>
 
-    <!-- SINGLE form with enctype="multipart/form-data" -->
-    <form action="/new_thread" method="POST" enctype="multipart/form-data">
-        <p>
-            Otsikko: <br />
-            <input
-                type="text"
-                name="title"
-                value="{{ title|default('') }}"
-            />
-        </p>
+            <p>
+                Hinta: <br />
+                <input
+                    type="number"
+                    name="price"
+                    value="{{ price|default('') }}"
+                />
+            </p>
 
-        <p>
-            Hinta: <br />
-            <input
-                type="number"
-                name="price"
-                value="{{ price|default('') }}"
-            />
-        </p>
+            <p>
+                Viesti: <br />
+                <textarea name="content" rows="5" cols="40">
+{{ content|default('') }}</textarea
+                >
+            </p>
 
-        <p>
-            Viesti: <br />
-            <textarea name="content" rows="5" cols="40">{{ content|default('') }}</textarea>
-        </p>
-
-                <p>
-            <label for="fileInput">Kuva(t):</label><br/>
-            <!--
+            <p>
+                <label for="fileInput">Kuva(t):</label><br />
+                <!--
                "multiple" allows selecting more than one file.
                The name "images" (with or without [] brackets) will let you handle
                multiple files on the server side via `request.files.getlist("images")`.
             -->
-            <input
-                type="file"
-                id="fileInput"
-                name="images"
-                accept="image/*"
-                multiple
-                required
-            />
-            <br/><small>Valitse vähintään yksi kuva. Voit valita useita kuvia (esim. Ctrl- tai Shift-näppäimellä).</small>
-        </p>
+                <input
+                    type="file"
+                    id="fileInput"
+                    name="images"
+                    accept="image/*"
+                    multiple
+                    required
+                />
+                <br /><small
+                    >Valitse vähintään yksi kuva. Voit valita useita kuvia
+                    (esim. Ctrl- tai Shift-näppäimellä).</small
+                >
+            </p>
 
-        <p>
-            Kategoria: <br />
-            <input
-                type="radio"
-                name="category"
-                value="1"
-                {% if category=="1" %} checked {%endif%}
-            />
-            Myynti
-            <input
-                type="radio"
-                name="category"
-                value="2"
-                {% if category=="2" %} checked {%endif%}
-            />
-            Osto
-            <input
-                type="radio"
-                name="category"
-                value="3"
-                {% if category=="3" %} checked {%endif%}
-            />
-            Vaihto
-        </p>
+            <p>
+                Kategoria: <br />
+                <input
+                    type="radio"
+                    name="category"
+                    value="1"
+                    {%
+                    if
+                    category=""
+                    ="1"
+                    %}
+                    checked
+                    {%endif%}
+                />
+                Myynti
+                <input
+                    type="radio"
+                    name="category"
+                    value="2"
+                    {%
+                    if
+                    category=""
+                    ="2"
+                    %}
+                    checked
+                    {%endif%}
+                />
+                Osto
+                <input
+                    type="radio"
+                    name="category"
+                    value="3"
+                    {%
+                    if
+                    category=""
+                    ="3"
+                    %}
+                    checked
+                    {%endif%}
+                />
+                Vaihto
+            </p>
 
-        <button type="submit">Lähetä</button>
-    </form>
-</body>
+            <button type="submit">Lähetä</button>
+        </form>
+    </body>
 </html>
