@@ -3,9 +3,9 @@ import math
 from flask import Flask, abort, Response
 from flask import redirect, render_template, request
 from flask import session, flash
-from werkzeug.security import generate_password_hash
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash, secrets
 import db
+from markupsafe import Markup, escape
 import config
 import posts
 
@@ -67,19 +67,18 @@ def index(page=1):
 
 
 @app.route("/login", methods=["POST", "GET"])
-def login(filled={}):
+def login():
     if request.method == "GET":
         return render_template("login.html")
 
     username = request.form["username"]
     password = request.form["password"]
-    filled = {"username": username}
     if not username or len(username) > 50:
         flash("VIRHE: Käyttäjänimi puuttuu tai on liian pitkä")
         return redirect("/login")
     if not password or len(password) > 100:
         flash("VIRHE: Salasana puuttuu tai on liian pitkä")
-        return render_template("login.html", filled=filled)
+        return render_template("login.html")
 
     sql = "SELECT id, password_hash FROM users WHERE username = ?"
     result = db.query(sql, [username])
@@ -107,12 +106,12 @@ def logout():
 
 
 @app.route("/new_thread", methods=["POST", "GET"])
-def new_thread(filled={}):
+def new_thread(filled=None):
     require_login()
-    check_csrf()
     if request.method == "GET":
-        return render_template("new_thread.html")
+        return render_template("new_thread.html", filled=filled)
 
+    check_csrf()
     price = int(request.form["price"])
     title = request.form["title"]
     content = request.form["content"]
@@ -123,18 +122,18 @@ def new_thread(filled={}):
 
     if len(images) == 0:
         flash("VIRHE: Valitse vähintään yksi kuva")
-        return render_template("new_thread.html", filled)
+        return render_template("new_thread.html", filled=filled)
 
     if not title or len(title) > 100:
         flash("VIRHE: Otsikko puuttuu tai on yli 100 merkkiä pitkä")
         if title:
             filled["title"] = title[0:99]
-        return render_template("new_thread.html", filled)
+        return render_template("new_thread.html", filled=filled)
     if not content or len(content) > 2000:
         if content:
             filled["content"] = content[0:1999]
         flash("VIRHE: Sisältö puuttuu tai on yli 2000 merkkiä pitkä")
-        return render_template("new_thread.html", filled)
+        return render_template("new_thread.html", filled=filled)
     if not type or type not in ["1", "2", "3"]:
         flash("VIRHE: Valitse kategoria")
         return redirect("/new_thread")
@@ -293,5 +292,12 @@ def show_user(user_id):
     return render_template("user.html", user=user, messages=messages)
 
 def check_csrf():
-    if request.form["csrf_token"] != session["csrf_token"]:
-        abort(403)
+    if request.method == "POST":
+        if request.form["csrf_token"] != session["csrf_token"]:
+            abort(403)
+
+@app.template_filter()
+def show_lines(content):
+    content = str(escape(content))
+    content = content.replace("\n", "<br>")
+    return Markup(content)

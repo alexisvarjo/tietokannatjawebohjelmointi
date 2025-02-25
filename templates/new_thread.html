@@ -24,6 +24,7 @@
 
         <!-- SINGLE form with enctype="multipart/form-data" -->
         <form action="/new_thread" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
             <p>
                 Otsikko: <br />
                 <input type="text" name="title" value="{{ filled.title }}" />
@@ -73,11 +74,7 @@
                     type="radio"
                     name="category"
                     value="1"
-                    {%
-                    if
-                    filled.category=""
-                    ="1"
-                    %}
+                    {% if filled.category=="1"%}
                     checked
                     {%endif%}
                 />
@@ -86,11 +83,7 @@
                     type="radio"
                     name="category"
                     value="2"
-                    {%
-                    if
-                    filled.category=""
-                    ="2"
-                    %}
+                    {% if filled.category=="2"%}
                     checked
                     {%endif%}
                 />
@@ -99,11 +92,7 @@
                     type="radio"
                     name="category"
                     value="3"
-                    {%
-                    if
-                    filled.category=""
-                    ="3"
-                    %}
+                    {% if filled.category=="3" %}
                     checked
                     {%endif%}
                 />

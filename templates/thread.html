@@ -64,7 +64,7 @@
         <!-- Display messages -->
         {% for message in messages %}
         <p>{{ message.username }} ({{ message.sent_at }}):</p>
-        <p>{{ message.content }}</p>
+        <p>{{ message.content | show_lines }}</p>
         {% if message.user_id == session.user_id %}
         <p>
             <a href="/edit/{{ message.id }}">Muokkaa</a> |
@@ -74,7 +74,7 @@
         <hr />
         {% endfor %} {% if session.user_id %}
         <h2>Uusi viesti</h2>
-        < action="/new_message" method="post">
+        <form action="/new_message" method="post">
             <p>
                 Viesti:<br />
                 <textarea name="content" rows="5" cols="40"></textarea>
