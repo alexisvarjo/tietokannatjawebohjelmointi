@@ -33,4 +33,4 @@ elapsed time: 0.00 seconds
 elapsed time: 0.00 seconds
 127.0.0.1 - - [25/Feb/2025 17:28:15] "GET /thread/999966 HTTP/1.1" 200 -
 elapsed time: 0.00 seconds
-127.0.0.1 - - [25/Feb/2025 17:28:15] "GET /picture/999966 HTTP/1.1" 200 -```
+127.0.0.1 - - [25/Feb/2025 17:28:15] "GET /picture/999966 HTTP/1.1" 200 -
