@@ -13,6 +13,8 @@ def get_posts(page, page_size):
         SELECT p.id,
                p.title,
                p.type AS category,
+               p.user_id,
+               u.username,
                COUNT(m.id) AS total,
                MAX(m.sent_at) AS last,
                (SELECT pic.id
@@ -27,6 +29,7 @@ def get_posts(page, page_size):
                 LIMIT 1) AS price
         FROM posts p
         LEFT JOIN messages m ON p.id = m.post_id
+        LEFT JOIN users u ON p.user_id = u.id
         GROUP BY p.id
         ORDER BY p.id DESC
         LIMIT ? OFFSET ?

@@ -34,6 +34,8 @@
                 <br />
                 {{ thread.category }} | Hinta: {{ thread.price }} €<br />
                 {{ thread.total }} viestiä, uusin: {{ thread.last }}
+                <br />
+                Käyttäjä: <a href="/user/{{ thread.username }}">{{ thread.username }}</a>
             </div>
         </div>
         <hr />
