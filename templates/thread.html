@@ -1,132 +1,149 @@
 <!doctype html>
 <html>
-    <head>
-        <title>{{ thread.title }}</title>
-        <style>
-            /* Ensure images shrink on smaller screens */
-            #carousel img {
-                max-width: 100%; /* or a fixed max-width (e.g., 600px) if you prefer */
-                height: auto;
-                display: block;
-                margin: 0 auto; /* center in container */
-            }
+  <head>
+    <meta charset="utf-8">
+    <title>{{ thread.title }}</title>
+    <style>
+      /* Basic page styles */
+      body {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      nav ul {
+        list-style-type: none;
+        display: inline-flex;
+        padding: 0;
+      }
+      nav li {
+        margin-right: 10px;
+      }
 
-            #carousel-controls {
-                text-align: center;
-                margin: 10px;
-            }
+      /* Carousel container styling */
+      .carousel {
+        position: relative;
+        width: 80%;
+        max-width: 500px; /* Forces the carousel to be a bit smaller */
+        margin: 20px auto;
+        overflow: hidden;
+      }
+      .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+      }
+      .carousel-item {
+        flex: 0 0 100%;
+      }
+      .carousel-item img {
+        width: 100%;
+        max-height: 400px; /* Force images to be scaled smaller */
+        object-fit: contain;
+        display: block;
+        margin: auto;
+      }
 
-            .carousel-btn {
-                padding: 6px 12px;
-                margin: 0 5px;
-                cursor: pointer;
-            }
+      /* Hide radio buttons */
+      .carousel input {
+        display: none;
+      }
 
-            /* Optional: style for the "Image X of Y" text */
-            #carousel-info {
-                text-align: center;
-                margin: 5px;
-                font-style: italic;
-            }
-        </style>
-    </head>
-    <body>
-        <nav>
-            <ul style="list-style-type: none; display: inline-flex">
-                <li><a href="/">Home</a></li>
-                <li>&nbsp;&nbsp;</li>
-                <li><a href="/about">About</a></li>
-                <li>&nbsp;&nbsp;</li>
-                <li><a href="/users">Users</a></li>
-            </ul>
-        </nav>
+      /* Navigation dots */
+      .carousel-dots {
+        text-align: center;
+        margin-top: 10px;
+      }
+      .carousel-dots label {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background: #ccc;
+        border-radius: 50%;
+        margin: 0 5px;
+        cursor: pointer;
+      }
 
-        <h1>{{ thread.title }}</h1>
-        <p>{{ thread.category }} Hinta: {{ price }} €</p>
+      /* Slide control via radio buttons.
+         For each image, when its radio is checked, shift the carousel. */
+      {% for i in range(1, pictures|length + 1) %}
+      #carousel-{{ i }}:checked ~ .carousel-inner {
+        transform: translateX(-{{ (i - 1) * 100 }}%);
+      }
+      #carousel-{{ i }}:checked ~ .carousel-dots label[for="carousel-{{ i }}"] {
+        background: #333;
+      }
+      {% endfor %}
 
-        <!-- CAROUSEL SECTION -->
-        {% if pictures %}
-        <div id="carousel">
-            <!-- The currently-displayed image -->
-            <img id="carousel-image" src="" alt="Carousel Image" />
+      /* Message and other content styles */
+      .message {
+        margin-bottom: 20px;
+      }
+      .message p {
+        margin: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/users">Users</a></li>
+      </ul>
+    </nav>
 
-            <!-- Display how many images, and which image is shown -->
-            <div id="carousel-info"></div>
+    <h1>{{ thread.title }}</h1>
+    <p>{{ thread.category }} Hinta: {{ price }} €</p>
 
-            <!-- Prev/Next buttons -->
-            <div id="carousel-controls">
-                <button class="carousel-btn" onclick="prevImage()">Prev</button>
-                <button class="carousel-btn" onclick="nextImage()">Next</button>
-            </div>
+    <!-- Carousel Section -->
+    {% if pictures %}
+    <div class="carousel">
+      {# Generate hidden radio buttons for each picture #}
+      {% for pic in pictures %}
+      <input type="radio" name="carousel" id="carousel-{{ loop.index }}" {% if loop.first %}checked{% endif %}>
+      {% endfor %}
+
+      <div class="carousel-inner">
+        {% for pic in pictures %}
+        <div class="carousel-item">
+          <img src="{{ url_for('serve_picture', picture_id=pic.id) }}" alt="Slide {{ loop.index }}">
         </div>
-        {% endif %}
+        {% endfor %}
+      </div>
 
-        <!-- Display messages -->
-        {% for message in messages %}
-        <p>{{ message.username }} ({{ message.sent_at }}):</p>
-        <p>{{ message.content | show_lines }}</p>
-        {% if message.user_id == session.user_id %}
-        <p>
-            <a href="/edit/{{ message.id }}">Muokkaa</a> |
-            <a href="/remove/{{ message.id }}">Poista</a>
-        </p>
-        {% endif %}
-        <hr />
-        {% endfor %} {% if session.user_id %}
-        <h2>Uusi viesti</h2>
-        <form action="/new_message" method="post">
-            <p>
-                Viesti:<br />
-                <textarea name="content" rows="5" cols="40"></textarea>
-            </p>
-            <input type="hidden" name="post_id" value="{{ thread.id }}" />
-            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"/>
-            <input type="submit" value="Lähetä" />
-        </form>
-        {% endif %}
+      <div class="carousel-dots">
+        {% for pic in pictures %}
+        <label for="carousel-{{ loop.index }}"></label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
 
-        <script>
-            // Create an array of image URLs from the pictures
-            var images = [
-                {% for pic in pictures %}
-                    "{{ url_for('serve_picture', picture_id=pic.id) }}",
-                {% endfor %}
-            ];
+    <!-- Display messages -->
+    {% for message in messages %}
+    <div class="message">
+      <p><strong>{{ message.username }}</strong> ({{ message.sent_at }}):</p>
+      <p>{{ message.content | show_lines }}</p>
+      {% if message.user_id == session.user_id %}
+      <p>
+        <a href="/edit/{{ message.id }}">Muokkaa</a> |
+        <a href="/remove/{{ message.id }}">Poista</a>
+      </p>
+      {% endif %}
+      <hr>
+    </div>
+    {% endfor %}
 
-            var currentIndex = 0;
-            var carouselImage = null;
-            var carouselInfo = null;
-
-            // Initialize the carousel on page load
-            window.onload = function() {
-                if (images.length > 0) {
-                    carouselImage = document.getElementById('carousel-image');
-                    carouselInfo = document.getElementById('carousel-info');
-                    showImage(currentIndex);
-                }
-            };
-
-            // Function to display an image by index
-            function showImage(index) {
-                // Update the <img> src
-                carouselImage.src = images[index];
-                // Update the "Image X of Y" text
-                if (carouselInfo) {
-                    carouselInfo.textContent = "Kuva " + (index + 1) + " / " + images.length;
-                }
-            }
-
-            // Show the previous image
-            function prevImage() {
-                currentIndex = (currentIndex - 1 + images.length) % images.length;
-                showImage(currentIndex);
-            }
-
-            // Show the next image
-            function nextImage() {
-                currentIndex = (currentIndex + 1) % images.length;
-                showImage(currentIndex);
-            }
-        </script>
-    </body>
+    {% if session.user_id %}
+    <h2>Uusi viesti</h2>
+    <form action="/new_message" method="post">
+      <p>
+        Viesti:<br>
+        <textarea name="content" rows="5" cols="40"></textarea>
+      </p>
+      <input type="hidden" name="post_id" value="{{ thread.id }}">
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+      <input type="submit" value="Lähetä">
+    </form>
+    {% endif %}
+  </body>
 </html>
