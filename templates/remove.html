@@ -8,7 +8,7 @@
     </ul>
 </nav>
 
-<form action="/remove/{{ message.id }}" method="post">
+<form action="/remove/{{ message.id }}" method="post" label="viestin poistaminen">
     <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
     <p>Haluatko varmasti poistaa viestin?</p>
     <input type="submit" name="continue" value="Jatka" />
