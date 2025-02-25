@@ -288,7 +288,7 @@ def show_user(user_id):
     user = posts.get_user(user_id)
     if not user:
         abort(404)
-    messages = posts.get_messages(user_id)
+    messages = posts.get_messages_byuser(user_id)
     return render_template("user.html", user=user, messages=messages)
 
 def check_csrf():

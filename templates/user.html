@@ -8,12 +8,20 @@
 {% endif %}
 <ul>
     {% for message in messages %}
-    <li>
-        <a href="/thread/{{ message.thread_id }}#{{ message.id }}">
+        Ilmoitus: <a href="/thread/{{ message.thread_id }}#{{ message.id }}">
             {{ message.thread_title }}
         </a>
-        <br />
-        ({{ message.sent_at }})
-    </li>
+        <br>
+        <br>
+        Viesti lähetetty: ({{ message.sent_at }})
+        <br>
+        <br>
+        Viestin sisältö:
+        <br>
+        <br>
+        {{ message.content | show_lines }}
+        <br>
+        <br>
+        <br>
     {% endfor %}
 </ul>

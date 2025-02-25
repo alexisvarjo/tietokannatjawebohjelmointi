@@ -167,11 +167,13 @@ def get_user(user_id):
 
 def get_messages_byuser(user_id):
     sql = """SELECT m.id,
-                    m.thread_id,
-                    t.title thread_title,
-                    m.sent_at
-             FROM threads t, messages m
-             WHERE t.id = m.thread_id AND
-                   m.user_id = ?
+                    m.post_id,
+                    p.title thread_title,
+                    m.sent_at,
+                    m.content
+             FROM posts p, messages m
+             WHERE p.id = m.post_id
+               AND m.user_id = ?
+               AND m.status = 1
              ORDER BY m.sent_at DESC"""
     return db.query(sql, [user_id])
