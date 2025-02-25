@@ -260,20 +260,26 @@ def new_message():
 
 @app.route("/users", methods=["GET"])
 def users():
+    # Get all users and threads
     users_list = [dict(u) for u in posts.get_users()]
     all_threads = [dict(t) for t in posts.get_user_threads()]
 
+    # Initialize aggregation fields for each user
     for user in users_list:
-        user['threads'] = []
+        user["thread_count"] = 0
+        user["message_count"] = 0
 
+    # Aggregate thread and message counts for each user
     for thread in all_threads:
-        thread['url'] = f"/thread/{thread['id']}"
         for user in users_list:
             if user["id"] == thread["user_id"]:
-                user["threads"].append(thread)
+                user["thread_count"] += 1
+                user["message_count"] += thread["message_count"]
                 break
 
+    # Render the template with one entry per user
     return render_template("users.html", users=users_list)
+
 
 @app.route("/about", methods=["GET"])
 def about():

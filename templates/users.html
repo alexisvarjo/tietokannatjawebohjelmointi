@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
-    <head>
-        <title>Ilmoitukset</title>
-    </head>
-
-        <nav>
+<head>
+    <title>Users</title>
+</head>
+<body>
+    <nav>
         <ul style="list-style-type: none; display: inline-flex">
             <li><a href="/">Home</a></li>
             <li>&nbsp;&nbsp;</li>
@@ -13,25 +13,21 @@
             <li><a href="/users">Users</a></li>
         </ul>
     </nav>
-    <body>
-        <h1>Ilmoitukset</h1>
-        <table>
-            <tr>
-                <th>Nimi</th>
-                <th>Ilmoituksen otsikko</th>
-                <th>Viestejä</th>
-                <th>Ilmoituksen tyyppi</th>
-            </tr>
-            {% for user in users %} {% for thread in user.threads %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>
-                    <a href="{{ thread.url }}">{{ thread.title }}</a>
-                </td>
-                <td>{{ thread.message_count }}</td>
-                <td>{{ thread.category }}</td>
-            </tr>
-            {% endfor %} {% endfor %}
-        </table>
-    </body>
+    <h1>Users</h1>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Thread Count</th>
+            <th>Total Message Count</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <!-- Link to the user's page; adjust the URL if needed -->
+            <td><a href="/user/{{ user.id }}">{{ user.username }}</a></td>
+            <td>{{ user.thread_count }}</td>
+            <td>{{ user.message_count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
 </html>
