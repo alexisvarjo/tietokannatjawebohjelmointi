@@ -3,7 +3,12 @@ from flask import g
 import db
 from flask import Flask
 
-def get_posts():
+def thread_count():
+    sql = "SELECT COUNT(*) FROM posts"
+    return db.query(sql)[0][0]
+
+def get_posts(page, page_size):
+    offset = (page - 1) * page_size
     sql = """
         SELECT p.id,
                p.title,
@@ -24,8 +29,9 @@ def get_posts():
         LEFT JOIN messages m ON p.id = m.post_id
         GROUP BY p.id
         ORDER BY p.id DESC
+        LIMIT ? OFFSET ?
     """
-    return db.query(sql)
+    return db.query(sql, [page_size, offset])
 
 
 
@@ -146,7 +152,10 @@ def add_price(post_id, price, type):
 
 def get_price(post_id):
     sql = "SELECT price FROM prices WHERE post_id = ?"
-    return db.query(sql, [post_id])[0][0]
+    result = db.query(sql, [post_id])
+    if result:
+        return result[0][0]
+    return None
 
 def get_user(user_id):
     sql = "SELECT username FROM users WHERE id = ?"

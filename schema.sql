@@ -33,3 +33,17 @@ CREATE TABLE prices (
     price REAL,
     type TEXT
 );
+
+-- messages
+CREATE INDEX idx_messages_post_id_id ON messages (post_id, id);
+
+CREATE INDEX idx_messages_user_id_sent_at ON messages (user_id, sent_at);
+
+-- pictures
+CREATE INDEX idx_pictures_post_id_id ON pictures (post_id, id);
+
+-- prices
+CREATE INDEX idx_prices_post_id_id ON prices (post_id, id);
+
+-- posts (only if you regularly filter by user_id)
+CREATE INDEX idx_posts_user_id ON posts (user_id);

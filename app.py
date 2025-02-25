@@ -1,4 +1,5 @@
 import sqlite3
+import math
 from flask import Flask, abort, Response
 from flask import redirect, render_template, request
 from flask import session
@@ -43,9 +44,19 @@ def create():
 
 
 @app.route("/")
-def index():
-    threads = posts.get_posts()
-    return render_template("index.html", threads=threads)
+@app.route("/<int:page>")
+def index(page=1):
+    page_size = 10
+    thread_count = posts.thread_count()
+    page_count = math.ceil(thread_count / page_size)
+    page_count = max(page_count, 1)
+    if page < 1:
+        return redirect("/1")
+    if page > page_count:
+        return redirect("/"+str(page_count))
+
+    threads = posts.get_posts(page, page_size)
+    return render_template("index.html", threads=threads, page=page, page_count=page_count)
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -72,6 +83,7 @@ def login():
     if check_password_hash(password_hash, password):
         session["username"] = username
         session["user_id"] = user_id  # Ensure user ID is added to the session
+        session["csrf_token"] = secrets.token_hex(16)
         return redirect("/")
     else:
         return render_template("login.html", error_message="VIRHE: Salasana tai käyttäjänimi on väärä", username=username)
@@ -86,6 +98,7 @@ def logout():
 @app.route("/new_thread", methods=["POST", "GET"])
 def new_thread():
     require_login()
+    check_csrf()
     if request.method == "GET":
         return render_template("new_thread.html")
 
@@ -144,6 +157,7 @@ def serve_picture(picture_id):
 @app.route("/edit/<int:message_id>", methods=["GET", "POST"])
 def edit_message(message_id):
     require_login()
+    check_csrf()
     message = posts.get_message(message_id)
     if message["user_id"] != session["user_id"]:
         abort(403)
@@ -178,6 +192,7 @@ def search():
 @app.route("/remove/<int:message_id>", methods=["GET", "POST"])
 def remove_message(message_id):
     require_login()
+    check_csrf()
     message = posts.get_message(message_id)
     message_count = posts.count_messages(message["post_id"])
 
@@ -197,6 +212,7 @@ def remove_message(message_id):
 @app.route("/new_message", methods=["POST"])
 def new_message():
     require_login()
+    check_csrf()
     content = request.form["content"]
     user_id = session["user_id"]
     thread_id = request.form["post_id"]
@@ -250,3 +266,7 @@ def show_user(user_id):
         abort(404)
     messages = posts.get_messages(user_id)
     return render_template("user.html", user=user, messages=messages)
+
+def check_csrf():
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
