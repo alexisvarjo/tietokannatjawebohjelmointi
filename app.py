@@ -1,6 +1,7 @@
 import sqlite3
+import time
 import math
-from flask import Flask, abort, Response
+from flask import Flask, abort, Response, g
 from flask import redirect, render_template, request
 from flask import session, flash
 from werkzeug.security import generate_password_hash, check_password_hash, secrets
@@ -258,27 +259,21 @@ def new_message():
             abort(403)
         return redirect("/thread/" + str(thread_id))
 
-@app.route("/users", methods=["GET"])
-def users():
-    # Get all users and threads
-    users_list = [dict(u) for u in posts.get_users()]
-    all_threads = [dict(t) for t in posts.get_user_threads()]
+@app.route("/users")
+@app.route("/users/<int:page>")
+def users(page=1):
+    page_size = 50
+    total_users = posts.user_count()
+    page_count = math.ceil(total_users / page_size)
+    page_count = max(page_count, 1)
 
-    # Initialize aggregation fields for each user
-    for user in users_list:
-        user["thread_count"] = 0
-        user["message_count"] = 0
+    if page < 1:
+        return redirect("/users/1")
+    if page > page_count:
+        return redirect("/users/" + str(page_count))
 
-    # Aggregate thread and message counts for each user
-    for thread in all_threads:
-        for user in users_list:
-            if user["id"] == thread["user_id"]:
-                user["thread_count"] += 1
-                user["message_count"] += thread["message_count"]
-                break
-
-    # Render the template with one entry per user
-    return render_template("users.html", users=users_list)
+    users_list = [dict(u) for u in posts.get_users_aggregated(page, page_size)]
+    return render_template("users.html", users=users_list, page=page, page_count=page_count)
 
 
 @app.route("/about", methods=["GET"])
@@ -307,3 +302,14 @@ def show_lines(content):
     content = str(escape(content))
     content = content.replace("\n", "<br>")
     return Markup(content)
+
+@app.before_request
+def before_request():
+    g.start_time = time.time()
+
+@app.after_request
+def after_request(response):
+    g.end_time = time.time()
+    g.execution_time = g.end_time - g.start_time
+    print(f"elapsed time: {g.execution_time:.2f} seconds")
+    return response

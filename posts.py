@@ -130,9 +130,10 @@ def search(keyword):
     """
     return db.query(sql, [f"%{keyword}%", f"%{keyword}%"])
 
-def get_users():
-    sql = "SELECT id, username FROM users"
-    return db.query(sql)
+def get_users(page, page_size):
+    offset = (page - 1) * page_size
+    sql = "SELECT id, username FROM users LIMIT ? OFFSET ?"
+    return db.query(sql, (page_size, offset))
 
 def get_user_threads():
     sql = """
@@ -169,6 +170,37 @@ def get_price(post_id):
     if result:
         return result[0][0]
     return None
+
+def get_users_aggregated(page, page_size):
+    offset = (page - 1) * page_size
+    sql = """
+    WITH page_users AS (
+        SELECT id, username
+        FROM users
+        ORDER BY id
+        LIMIT ? OFFSET ?
+    )
+    SELECT
+        pu.id,
+        pu.username,
+        COUNT(DISTINCT p.id) AS thread_count,
+        COALESCE(SUM(msg.message_count), 0) AS message_count
+    FROM page_users pu
+    LEFT JOIN posts p ON pu.id = p.user_id
+    LEFT JOIN (
+        SELECT post_id, COUNT(id) AS message_count
+        FROM messages
+        GROUP BY post_id
+    ) AS msg ON p.id = msg.post_id
+    GROUP BY pu.id, pu.username
+    ORDER BY pu.id
+    """
+    return db.query(sql, (page_size, offset))
+
+def user_count():
+    sql = "SELECT COUNT(*) AS count FROM users"
+    result = db.query(sql)
+    return result[0]["count"] if result else 0
 
 def get_user(user_id):
     sql = "SELECT username FROM users WHERE id = ?"
